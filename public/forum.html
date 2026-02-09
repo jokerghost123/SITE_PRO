@@ -55,8 +55,7 @@
     const messageInput = document.getElementById("messageInput");
 
     // On définit si l'utilisateur est Admin ou Client (pour le test, on met Client)
-    const monPseudo = "Client"; 
-
+const monPseudo = localStorage.getItem('userName') || "Visiteur";
     async function chargerMessages() {
         try {
             const response = await fetch('/api/messages');
