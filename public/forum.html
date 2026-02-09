@@ -7,11 +7,14 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        body { background:#f5f6fa; padding-bottom: 70px; }
-        .chat { height:450px; overflow-y:auto; background:white; padding:20px; border-radius: 15px; border: 1px solid #ddd; }
-        .msg { padding:10px 15px; border-radius:20px; margin:10px 0; max-width:85%; position: relative; font-size: 0.95rem; }
-        .me { background:#0d6efd; color:white; margin-left:auto; border-bottom-right-radius: 2px; }
-        .other { background:#e9ecef; color: #333; margin-right:auto; border-bottom-left-radius: 2px; }
+        body { background:#f5f6fa; padding-bottom: 80px; }
+        .chat { height:450px; overflow-y:auto; background:white; padding:20px; border-radius: 15px; border: 1px solid #ddd; display: flex; flex-direction: column; }
+        .msg { padding:10px 15px; border-radius:20px; margin:5px 0; max-width:85%; position: relative; font-size: 0.95rem; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        /* Style pour l'Admin (Toi) */
+        .me { background:#0d6efd; color:white; align-self: flex-end; border-bottom-right-radius: 2px; }
+        /* Style pour les Clients */
+        .other { background:#e9ecef; color: #333; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .pseudo { font-size: 0.75rem; font-weight: bold; margin-bottom: 2px; display: block; }
     </style>
 </head>
 <body>
@@ -39,7 +42,7 @@
         </div>
 
     <form id="msgForm" class="input-group shadow-sm">
-        <input type="text" id="messageInput" class="form-control" placeholder="Écrire un message..." required>
+        <input type="text" id="messageInput" class="form-control" placeholder="Écrire un message..." required autocomplete="off">
         <button class="btn btn-primary" type="submit">
             <i class="fa fa-paper-plane"></i>
         </button>
@@ -51,7 +54,9 @@
     const msgForm = document.getElementById("msgForm");
     const messageInput = document.getElementById("messageInput");
 
-    // Charger les messages depuis le serveur
+    // On définit si l'utilisateur est Admin ou Client (pour le test, on met Client)
+    const monPseudo = "Client"; 
+
     async function chargerMessages() {
         try {
             const response = await fetch('/api/messages');
@@ -59,41 +64,41 @@
             chat.innerHTML = ""; 
 
             messages.forEach(msg => {
-                // On affiche "Anonyme" si le nom n'est pas trouvé
                 const div = document.createElement('div');
-                div.className = `msg other shadow-sm`;
-                div.innerHTML = `<strong>${msg.pseudo || 'Utilisateur'}:</strong><br>${msg.texte}`;
+                // Si le pseudo est "Admin", on met le style bleu à droite, sinon gris à gauche
+                const isMe = msg.pseudo === "Admin"; 
+                div.className = `msg ${isMe ? 'me' : 'other'}`;
+                
+                div.innerHTML = `<span class="pseudo">${msg.pseudo}</span>${msg.texte}`;
                 chat.appendChild(div);
             });
             chat.scrollTop = chat.scrollHeight;
         } catch (err) { console.error("Erreur de chargement", err); }
     }
 
-    // Envoyer un message
-// Envoyer un message
-msgForm.onsubmit = async (e) => {
-    e.preventDefault();
-    const texte = messageInput.value;
+    msgForm.onsubmit = async (e) => {
+        e.preventDefault();
+        const texte = messageInput.value;
+        if(!texte.trim()) return;
 
-    // On récupère le nom stocké dans le navigateur (ou "Anonyme" si vide)
-    const monPseudo = localStorage.getItem('userName') || "Anonyme";
+        try {
+            await fetch('/api/messages', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ texte: texte, pseudo: monPseudo }) 
+            });
+            messageInput.value = "";
+            chargerMessages();
+        } catch (err) { alert("Erreur d'envoi"); }
+    };
 
-    await fetch('/api/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-            texte: texte, 
-            pseudo: monPseudo 
-        }) 
-    });
-
-    messageInput.value = "";
-    chargerMessages(); 
-};
-
-    setInterval(chargerMessages, 3000); // Actualise toutes les 3 secondes
+    setInterval(chargerMessages, 3000);
     window.onload = chargerMessages;
 </script>
+
+<footer class="bg-dark text-white text-center p-3 fixed-bottom" style="font-size: 0.8rem;">
+  © 2026 FULL TECH - Excellence Technologique en Haïti
+</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
