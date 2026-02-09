@@ -4,9 +4,8 @@ const path = require('path');
 const app = express();
 
 // --- CONFIGURATION ---
-const PORT = process.env.PORT || 3000;
-// Ton lien MongoDB avec ton mot de passe intégré
-const MONGO_URL = process.env.MONGO_URL || "mongodb+srv://JOKER:JOKERGHOST04082002@cluster0.vgkacqh.mongodb.net/?appName=Cluster0";
+const PORT = process.env.PORT || 10000; // Render utilise souvent 10000
+const MONGO_URL = process.env.MONGO_URL || "mongodb+srv://jokerghost123:TON_MOT_DE_PASSE@cluster0.vscpy.mongodb.net/SITE_PRO?retryWrites=true&w=majority";
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -18,18 +17,19 @@ mongoose.connect(MONGO_URL)
     .catch(err => console.log("❌ Erreur de connexion MongoDB :", err));
 
 // --- MODÈLES ---
-const User = mongoose.Schema({
+const UserSchema = new mongoose.Schema({
     nom: String,
     gmail: String,
     mdp: String
 });
-const UserAccount = mongoose.model('User', User);
+const UserAccount = mongoose.model('User', UserSchema);
 
-const Message = mongoose.model('Message', new mongoose.Schema({
+const MessageSchema = new mongoose.Schema({
     pseudo: String,
     texte: String,
     date: { type: Date, default: Date.now }
-}));
+});
+const Message = mongoose.model('Message', MessageSchema);
 
 // --- ROUTES ---
 
@@ -44,12 +44,11 @@ app.post('/save', async (req, res) => {
     }
 });
 
-// Connexion (Modifiée pour envoyer le nom au navigateur)
+// Connexion
 app.post('/login', async (req, res) => {
     try {
         const user = await UserAccount.findOne({ gmail: req.body.gmail, mdp: req.body.mdp });
         if (user) {
-            // On renvoie une petite page qui enregistre le nom dans le navigateur avant d'aller à l'index
             res.send(`
                 <script>
                     localStorage.setItem('userName', '${user.nom}');
@@ -57,7 +56,7 @@ app.post('/login', async (req, res) => {
                 </script>
             `);
         } else {
-            res.send("<h1 style='color:red;text-align:center;'>Email ou mot de passe incorrect.</h1>");
+            res.send("<h1 style='color:red;text-align:center;'>Email ou mot de passe incorrect</h1>");
         }
     } catch (e) {
         res.status(500).send("Erreur : " + e.message);
@@ -66,8 +65,12 @@ app.post('/login', async (req, res) => {
 
 // Forum : Récupérer les messages
 app.get('/api/messages', async (req, res) => {
-    const messages = await Message.find().sort({ date: 1 });
-    res.json(messages);
+    try {
+        const messages = await Message.find().sort({ date: 1 });
+        res.json(messages);
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
 });
 
 // Forum : Envoyer un message
@@ -85,3 +88,4 @@ app.post('/api/messages', async (req, res) => {
 app.listen(PORT, () => {
     console.log(`🚀 Serveur FULL TECH actif sur le port : ${PORT}`);
 });
+
