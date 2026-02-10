@@ -1,5 +1,29 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const axios = require('axios');
+
+async function envoyerNotification(pseudo, texte) {
+    try {
+        await axios.post("https://onesignal.com/api/v1/notifications", {
+            // Ton App ID récupéré sur l'écran précédent
+            app_id: "a8937c96-c30c-4896-b701-abb0e1daec26", 
+            included_segments: ["All"],
+            headings: { "en": "FULL TECH - Nouveau Message" },
+            contents: { "en": `${pseudo}: ${texte}` },
+            url: "https://full-tech.onrender.com/admin.html"
+        }, {
+            headers: {
+                // Ta clé API REST que tu viens de copier (ne pas oublier 'Basic ')
+                "Authorization": "Basic os_v2_app_vcjxzfwdbrejnnybvoyodwxmezulcm7wkw5ut557nad7ymoeamt5mnunbfptybdqyomjk3oxvc4ole72n3wqn6bncpw7pjewwwgwf5y",
+                "Content-Type": "application/json"
+            }
+        });
+        console.log("🔔 Notification envoyée au boss !");
+    } catch (e) {
+        console.log("❌ Erreur OneSignal :", e.response ? e.response.data : e.message);
+    }
+}
+
 const path = require('path');
 const app = express();
 
@@ -78,11 +102,18 @@ app.post('/api/messages', async (req, res) => {
     try {
         const nouveauMsg = new Message(req.body);
         await nouveauMsg.save();
+
+        // AJOUTE CETTE LIGNE ICI :
+        if (req.body.pseudo !== "Admin") {
+            envoyerNotification(req.body.pseudo, req.body.texte);
+        }
+
         res.json({ status: "OK" });
     } catch (e) {
         res.status(500).json({ error: e.message });
     }
 });
+
 
 // Lancement
 app.listen(PORT, () => {
