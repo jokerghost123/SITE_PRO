@@ -82,6 +82,10 @@ app.get('/logout', (req, res) => {
     `);
 });
 
+app.get('/admin.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
+
 // Forum : Récupérer les messages
 app.get('/api/messages', async (req, res) => {
     try {
