@@ -1,215 +1,143 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - FULL TECH</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel - FULL TECH</title>
 
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignal.SDK.js" defer></script>
 <script>
-  window.OneSignalDeferred = window.OneSignalDeferred || [];
-  OneSignalDeferred.push(async function(OneSignal) {
-    await OneSignal.init({
-      appId: "a8937c96-c30c-4896-b701-abb0e1daec26", // Ton App ID
-    });
-  });
+window.OneSignalDeferred = window.OneSignalDeferred || [];
+OneSignalDeferred.push(async function(OneSignal) {
+await OneSignal.init({
+appId: "a8937c96-c30c-4896-b701-abb0e1daec26",
+safari_web_id: "web.onesignal.auto.10425c27-7f99-4d6d-886d-06606087b7a8",
+notifyButton: {
+enable: true, // Affiche une petite cloche en bas à droite
+},
+});
+});
 </script>
 
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root {
+--dark-bg: #0f172a;
+--card-bg: #1e293b;
+--accent-color: #3b82f6;
+--admin-msg: #2563eb;
+--client-msg: #334155;
+}
 
-    <style>
-        :root {
-            --dark-bg: #0f172a;
-            --card-bg: #1e293b;
-            --accent-color: #3b82f6;
-            --admin-msg: #2563eb;
-            --client-msg: #334155;
-        }
+body {
+background: var(--dark-bg);
+color: #f8fafc;
+font-family: 'Segoe UI', sans-serif;
+padding-bottom: 40px;
+}
 
-        body { 
-            background: var(--dark-bg); 
-            color: #f8fafc;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            padding-bottom: 40px;
-        }
+.admin-header {
+background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+padding: 30px;
+border-bottom: 2px solid var(--accent-color);
+border-radius: 0 0 30px 30px;
+margin-bottom: 30px;
+}
 
-        /* En-tête Moderne */
-        .admin-header {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            padding: 30px;
-            border-bottom: 2px solid var(--accent-color);
-            border-radius: 0 0 30px 30px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            margin-bottom: 30px;
-        }
+.admin-title {
+text-transform: uppercase;
+font-weight: 800;
+background: linear-gradient(to right, #60a5fa, #3b82f6);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 15px;
+}
 
-        .admin-title {
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-weight: 800;
-            background: linear-gradient(to right, #60a5fa, #3b82f6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-        }
+.chat-container {
+background: var(--card-bg);
+height: 500px;
+border-radius: 20px;
+display: flex;
+flex-direction: column;
+border: 1px solid rgba(255,255,255,0.1);
+}
 
-        /* Zone de Chat */
-        .chat-container {
-            background: var(--card-bg);
-            height: 550px;
-            border-radius: 20px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
+#chat {
+flex: 1;
+overflow-y: auto;
+padding: 20px;
+display: flex;
+flex-direction: column;
+gap: 10px;
+}
 
-        #chat {
-            flex: 1;
-            overflow-y: auto;
-            padding: 25px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            background: rgba(15, 23, 42, 0.5);
-        }
+.msg {
+max-width: 80%;
+padding: 10px 15px;
+border-radius: 15px;
+font-size: 0.9rem;
+}
 
-        /* Bulles de message */
-        .msg {
-            max-width: 80%;
-            padding: 12px 18px;
-            border-radius: 18px;
-            font-size: 0.95rem;
-            position: relative;
-            line-height: 1.4;
-        }
+.me { background: var(--admin-msg); align-self: flex-end; }
+.other { background: var(--client-msg); align-self: flex-start; }
 
-        .me {
-            background: var(--admin-msg);
-            color: white;
-            align-self: flex-end;
-            border-bottom-right-radius: 4px;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-        }
-
-        .other {
-            background: var(--client-msg);
-            color: #f1f5f9;
-            align-self: flex-start;
-            border-bottom-left-radius: 4px;
-        }
-
-        .pseudo {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            font-weight: bold;
-            display: block;
-            margin-bottom: 4px;
-            opacity: 0.8;
-        }
-
-        /* Barre d'envoi */
-        .input-area {
-            padding: 20px;
-            background: #1e293b;
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .form-control {
-            background: #0f172a !important;
-            border: 1px solid #334155 !important;
-            color: white !important;
-            border-radius: 12px;
-            padding: 12px 20px;
-        }
-
-        .btn-send {
-            border-radius: 12px;
-            padding: 0 25px;
-            font-weight: bold;
-            background: var(--accent-color);
-            border: none;
-            transition: 0.3s;
-        }
-
-        .btn-send:hover {
-            transform: scale(1.05);
-            background: #2563eb;
-        }
-    </style>
+.input-area { padding: 15px; background: #1e293b; border-radius: 0 0 20px 20px; }
+.form-control { background: #0f172a !important; color: white !important; border: 1px solid #334155 !important; }
+</style>
 </head>
 <body>
 
 <div class="admin-header text-center">
-    <h2 class="admin-title">
-        <i class="fa-solid fa-user-shield"></i>
-        ADMINISTRATION DES MESSAGES FULL TECH
-    </h2>
-    <p class="text-muted small">Panneau de contrôle sécurisé v2.0</p>
+<h2 class="admin-title"><i class="fa-solid fa-user-shield"></i> FULL TECH ADMIN</h2>
 </div>
 
 <div class="container">
-    <div class="chat-container shadow-2xl">
-        <div id="chat">
-            </div>
-
-        <form id="msgForm" class="input-area">
-            <div class="input-group">
-                <input type="text" id="messageInput" class="form-control" placeholder="Répondre au client..." required autocomplete="off">
-                <button class="btn btn-primary btn-send" type="submit">
-                    <i class="fa fa-paper-plane me-2"></i> ENVOYER
-                </button>
-            </div>
-        </form>
-    </div>
+<div class="chat-container">
+<div id="chat"></div>
+<form id="msgForm" class="input-area">
+<div class="input-group">
+<input type="text" id="messageInput" class="form-control" placeholder="Répondre..." required>
+<button class="btn btn-primary" type="submit">Envoyer</button>
+</div>
+</form>
+</div>
 </div>
 
 <script>
-    const chat = document.getElementById("chat");
-    const msgForm = document.getElementById("msgForm");
-    const messageInput = document.getElementById("messageInput");
+const chat = document.getElementById("chat");
+const msgForm = document.getElementById("msgForm");
+const messageInput = document.getElementById("messageInput");
 
-    const monPseudo = "Admin"; 
+async function chargerMessages() {
+const response = await fetch('/api/messages');
+const messages = await response.json();
+chat.innerHTML = "";
+messages.forEach(msg => {
+const div = document.createElement('div');
+div.className = `msg ${msg.pseudo === "Admin" ? 'me' : 'other'}`;
+div.innerHTML = `<small style="display:block; font-weight:bold">${msg.pseudo}</small>${msg.texte}`;
+chat.appendChild(div);
+});
+chat.scrollTop = chat.scrollHeight;
+}
 
-    async function chargerMessages() {
-        try {
-            const response = await fetch('/api/messages');
-            const messages = await response.json();
-            chat.innerHTML = ""; 
+msgForm.onsubmit = async (e) => {
+e.preventDefault();
+await fetch('/api/messages', {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify({ texte: messageInput.value, pseudo: "Admin" })
+});
+messageInput.value = "";
+chargerMessages();
+};
 
-            messages.forEach(msg => {
-                const div = document.createElement('div');
-                const isMe = msg.pseudo === "Admin"; 
-                div.className = `msg ${isMe ? 'me' : 'other'}`;
-                div.innerHTML = `<span class="pseudo">${msg.pseudo}</span>${msg.texte}`;
-                chat.appendChild(div);
-            });
-            chat.scrollTop = chat.scrollHeight;
-        } catch (err) { console.error("Erreur de synchronisation", err); }
-    }
-
-    msgForm.onsubmit = async (e) => {
-        e.preventDefault();
-        const texte = messageInput.value;
-        if(!texte.trim()) return;
-
-        await fetch('/api/messages', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ texte: texte, pseudo: monPseudo }) 
-        });
-
-        messageInput.value = "";
-        chargerMessages();
-    };
-
-    setInterval(chargerMessages, 3000);
-    window.onload = chargerMessages;
+setInterval(chargerMessages, 3000);
+window.onload = chargerMessages;
 </script>
-
 </body>
 </html>
