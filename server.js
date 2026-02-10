@@ -5,7 +5,7 @@ const app = express();
 
 // --- CONFIGURATION ---
 const PORT = process.env.PORT || 10000; // Render utilise souvent 10000
-const MONGO_URL = process.env.MONGO_URL || "mongodb+srv://jokerghost123:TON_MOT_DE_PASSE@cluster0.vscpy.mongodb.net/SITE_PRO?retryWrites=true&w=majority";
+const MONGO_URL = process.env.MONGO_URL || "mongodb+srv://JOKER:JOKERGHOST04082002@cluster0.vgkacqh.mongodb.net/SITE_PRO?retryWrites=true&w=majority&appName=Cluster0";
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
