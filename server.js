@@ -1,6 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const axios = require('axios');
+const path = require('path');
+app.use(express.static(path.join(__dirname, 'public')));
 
 async function envoyerNotification(pseudo, texte) {
     try {
@@ -27,7 +29,6 @@ async function envoyerNotification(pseudo, texte) {
 const path = require('path');
 const express = require('express');
 const app = express();
-
 // Cette ligne est la clé, elle dit au serveur d'ouvrir le dossier public
 app.use(express.static(path.join(__dirname, 'public')));
 
