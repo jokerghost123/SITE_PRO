@@ -42,6 +42,48 @@ const UserAccount = mongoose.model('User', new mongoose.Schema({
 }));
 
 // --- ROUTES ---
+
+// 1. INSCRIPTION (Enregistre et connecte direct)
+app.post('/save', async (req, res) => {
+    try {
+        const nouvelUtilisateur = new UserAccount(req.body);
+        await nouvelUtilisateur.save();
+        res.send(`
+            <script>
+                localStorage.setItem('userName', '${nouvelUtilisateur.nom}');
+                alert('Compte créé avec succès !');
+                window.location.href = '/index.html';
+            </script>
+        `);
+    } catch (e) {
+        res.status(500).send("Erreur lors de l'inscription.");
+    }
+});
+
+// 2. CONNEXION (Vérifie les infos)
+app.post('/login', async (req, res) => {
+    try {
+        const user = await UserAccount.findOne({ gmail: req.body.gmail, mdp: req.body.mdp });
+        if (user) {
+            res.send(`
+                <script>
+                    localStorage.setItem('userName', '${user.nom}');
+                    window.location.href = '/index.html';
+                </script>
+            `);
+        } else {
+            res.send(`
+                <script>
+                    alert('Email ou mot de passe incorrect');
+                    window.location.href = '/login.html';
+                </script>
+            `);
+        }
+    } catch (e) {
+        res.status(500).send("Erreur de connexion.");
+    }
+});
+
 app.get('/api/messages', async (req, res) => {
     const messages = await Message.find().sort({ date: 1 });
     res.json(messages);
@@ -58,7 +100,6 @@ app.get('/logout', (req, res) => {
     res.send("<script>localStorage.removeItem('userName'); window.location.href='/login.html';</script>");
 });
 
-// Route forcée pour l'admin
 app.get('/admin.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
