@@ -9,25 +9,25 @@
 
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignal.SDK.js" defer></script>
 <script>
-  window.OneSignalDeferred = window.OneSignalDeferred || [];
-  OneSignalDeferred.push(async function(OneSignal) {
-    await OneSignal.init({
-      appId: "a8937c96-c30c-4896-b701-abb0e1daec26", // Ton App ID
-    });
-  });
+window.OneSignalDeferred = window.OneSignalDeferred || [];
+OneSignalDeferred.push(async function(OneSignal) {
+await OneSignal.init({
+appId: "a8937c96-c30c-4896-b701-abb0e1daec26",
+});
+});
 </script>
-
 
 <style>
 body { background:#f5f6fa; }
 .card { border-radius:15px; box-shadow:0 5px 15px rgba(0,0,0,.1); transition: 0.3s; }
 .card:hover { transform: translateY(-5px); }
-/* Barre de recherche plus pro */
-.search-container { position: relative; min-width: 250px; }
+.search-container { position: relative; min-width: 200px; }
 .search-container input { border-radius: 20px; padding-left: 35px; border: none; }
 .search-container i { position: absolute; left: 12px; top: 10px; color: #aaa; }
 .step-icon { font-size: 2rem; color: #0d6efd; margin-bottom: 10px; }
 .info-section { background: #ffffff; border-radius: 15px; padding: 30px; margin-bottom: 40px; border-left: 5px solid #0d6efd; }
+.badge-cart { position: absolute; top: -5px; right: -5px; font-size: 0.7rem; }
+.nav-link { position: relative; }
 </style>
 </head>
 <body>
@@ -38,21 +38,33 @@ body { background:#f5f6fa; }
 <i class="fa-solid fa-bolt text-warning"></i> FULL TECH
 </a>
 
-<button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#menu">
+<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuPrincipal">
 <span class="navbar-toggler-icon"></span>
 </button>
 
-<div class="collapse navbar-collapse" id="menu">
-    <div class="ms-auto me-auto search-container my-2 my-lg-0">
-        <i class="fa fa-search"></i>
-        <input class="form-control" type="text" id="searchInput" placeholder="Rechercher un produit..." onkeyup="filterProducts()">
-    </div>
+<div class="collapse navbar-collapse" id="menuPrincipal">
+<div class="ms-auto me-auto search-container my-2 my-lg-0">
+<i class="fa fa-search"></i>
+<input class="form-control" type="text" id="searchInput" placeholder="Rechercher..." onkeyup="filterProducts()">
+</div>
 
-    <ul class="navbar-nav gap-2">
-        <li class="nav-item"><a class="nav-link active" href="/"><i class="fa fa-house"></i> Accueil</a></li>
-        <li class="nav-item"><a class="nav-link" href="inscription.html"><i class="fa fa-user"></i> Inscription</a></li>
-        <li class="nav-item"><a class="nav-link" href="forum.html"><i class="fa fa-comments"></i> Forum</a></li>
-    </ul>
+<ul class="navbar-nav gap-2 align-items-center">
+<li class="nav-item"><a class="nav-link active" href="/"><i class="fa fa-house"></i> Accueil</a></li>
+<li class="nav-item"><a class="nav-link" href="forum.html"><i class="fa fa-comments"></i> Forum</a></li>
+
+<li class="nav-item">
+<a class="nav-link" href="#" onclick="showCart()">
+<i class="fa fa-shopping-cart"></i>
+<span class="badge rounded-pill bg-danger badge-cart" id="cartCount">0</span>
+</a>
+</li>
+
+<li class="nav-item ms-lg-3">
+<button class="btn btn-outline-danger btn-sm" onclick="deconnexion()">
+<i class="fa-solid fa-power-off"></i> Déconnexion
+</button>
+</li>
+</ul>
 </div>
 </div>
 </nav>
@@ -63,101 +75,113 @@ body { background:#f5f6fa; }
 </header>
 
 <div class="container my-5">
-    
-    <div class="info-section shadow-sm">
-        <h2 class="text-center mb-4">Comment passer commande ?</h2>
-        <div class="row text-center g-4">
-            <div class="col-md-4">
-                <i class="fa-solid fa-comments-dollar step-icon"></i>
-                <h5>1. Exprimez votre besoin</h5>
-                <p class="text-muted">Dites-nous ce que vous cherchez sur le <a href="forum.html" class="fw-bold">Forum</a>.</p>
-            </div>
-            <div class="col-md-4">
-                <i class="fa-solid fa-file-signature step-icon"></i>
-                <h5>2. Validation</h5>
-                <p class="text-muted">Nous confirmons les détails avec vous.</p>
-            </div>
-            <div class="col-md-4">
-                <i class="fa-solid fa-truck-fast step-icon"></i>
-                <h5>3. Livraison & Paiement</h5>
-                <p class="text-muted">Payez **uniquement à la livraison**.</p>
-            </div>
-        </div>
-    </div>
 
-    <h2 class="mb-4" id="productTitle"><i class="fa-solid fa-microchip text-primary"></i> Nos Produits</h2>
-    
-    <div class="row g-4" id="productGrid">
-        <div class="col-md-4 product-card">
-            <div class="card h-100">
-                <img src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500&q=80" class="card-img-top" alt="PC Gamer" style="height: 200px; object-fit: cover;">
-                <div class="card-body text-center">
-                    <h5 class="product-name">PC Gamer RTX</h5>
-                    <p class="fw-bold text-primary">1200 $</p>
-                    <button class="btn btn-primary w-100" onclick="buy('PC Gamer RTX')">Commander</button>
-                </div>
-            </div>
-        </div>
+<div class="info-section shadow-sm">
+<h2 class="text-center mb-4">Comment passer commande ?</h2>
+<div class="row text-center g-4">
+<div class="col-md-4">
+<i class="fa-solid fa-comments-dollar step-icon"></i>
+<h5>1. Exprimez votre besoin</h5>
+<p class="text-muted">Dites-nous ce que vous cherchez sur le <a href="forum.html" class="fw-bold">Forum</a>.</p>
+</div>
+<div class="col-md-4">
+<i class="fa-solid fa-file-signature step-icon"></i>
+<h5>2. Validation</h5>
+<p class="text-muted">Nous confirmons les détails avec vous.</p>
+</div>
+<div class="col-md-4">
+<i class="fa-solid fa-truck-fast step-icon"></i>
+<h5>3. Livraison & Paiement</h5>
+<p class="text-muted">Payez **uniquement à la livraison**.</p>
+</div>
+</div>
+</div>
 
-        <div class="col-md-4 product-card">
-            <div class="card h-100">
-                <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500&q=80" class="card-img-top" alt="iPhone 14" style="height: 200px; object-fit: cover;">
-                <div class="card-body text-center">
-                    <h5 class="product-name">iPhone 14</h5>
-                    <p class="fw-bold text-primary">899 $</p>
-                    <button class="btn btn-primary w-100" onclick="buy('iPhone 14')">Commander</button>
-                </div>
-            </div>
-        </div>
+<h2 class="mb-4" id="productTitle"><i class="fa-solid fa-microchip text-primary"></i> Nos Produits</h2>
 
-        <div class="col-md-4 product-card">
-            <div class="card h-100">
-                <img src="https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=500&q=80" class="card-img-top" alt="Casque Gaming" style="height: 200px; object-fit: cover;">
-                <div class="card-body text-center">
-                    <h5 class="product-name">Casque Gaming</h5>
-                    <p class="fw-bold text-primary">89 $</p>
-                    <button class="btn btn-primary w-100" onclick="buy('Casque Gaming')">Commander</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div id="noResult" class="text-center mt-5 d-none">
-        <h4><i class="fa-solid fa-magnifying-glass"></i> Aucun produit ne correspond à votre recherche.</h4>
-    </div>
+<div class="row g-4" id="productGrid">
+<div class="col-md-4 product-card">
+<div class="card h-100">
+<img src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500&q=80" class="card-img-top" alt="PC Gamer" style="height: 200px; object-fit: cover;">
+<div class="card-body text-center">
+<h5 class="product-name">PC Gamer RTX</h5>
+<p class="fw-bold text-primary">1200 $</p>
+<button class="btn btn-primary w-100" onclick="addToCart('PC Gamer RTX', 1200)">Ajouter au panier</button>
+</div>
+</div>
+</div>
+
+<div class="col-md-4 product-card">
+<div class="card h-100">
+<img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500&q=80" class="card-img-top" alt="iPhone 14" style="height: 200px; object-fit: cover;">
+<div class="card-body text-center">
+<h5 class="product-name">iPhone 14</h5>
+<p class="fw-bold text-primary">899 $</p>
+<button class="btn btn-primary w-100" onclick="addToCart('iPhone 14', 899)">Ajouter au panier</button>
+</div>
+</div>
+</div>
+
+<div class="col-md-4 product-card">
+<div class="card h-100">
+<img src="https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=500&q=80" class="card-img-top" alt="Casque Gaming" style="height: 200px; object-fit: cover;">
+<div class="card-body text-center">
+<h5 class="product-name">Casque Gaming</h5>
+<p class="fw-bold text-primary">89 $</p>
+<button class="btn btn-primary w-100" onclick="addToCart('Casque Gaming', 89)">Ajouter au panier</button>
+</div>
+</div>
+</div>
+</div>
+
+<div id="noResult" class="text-center mt-5 d-none">
+<h4><i class="fa-solid fa-magnifying-glass"></i> Aucun produit trouvé.</h4>
+</div>
 </div>
 
 <footer class="bg-dark text-white text-center p-4">
-    <p>© 2026 FULL TECH - Excellence Technologique en Haïti</p>
+<p>© 2026 FULL TECH - Excellence Technologique en Haïti</p>
 </footer>
 
 <script>
-// SCRIPT DE RECHERCHE EN TEMPS RÉEL
-function filterProducts() {
-    let input = document.getElementById('searchInput').value.toLowerCase();
-    let cards = document.getElementsByClassName('product-card');
-    let hasResult = false;
+let cart = [];
 
-    for (let i = 0; i < cards.length; i++) {
-        let name = cards[i].querySelector('.product-name').innerText.toLowerCase();
-        if (name.includes(input)) {
-            cards[i].style.display = "";
-            hasResult = true;
-        } else {
-            cards[i].style.display = "none";
-        }
-    }
-
-    // Afficher message "Aucun résultat" si besoin
-    let noResult = document.getElementById('noResult');
-    if (hasResult) {
-        noResult.classList.add('d-none');
-    } else {
-        noResult.classList.remove('d-none');
-    }
+function addToCart(name, price) {
+cart.push({name, price});
+document.getElementById('cartCount').innerText = cart.length;
+alert(name + " ajouté au panier !");
 }
 
-function buy(productName){
-    alert("Excellent choix ! Pour commander le " + productName + ", laissez un message sur le Forum. Paiement à la livraison !");
+function showCart() {
+if(cart.length === 0) {
+alert("Votre panier est vide.");
+} else {
+let list = cart.map(item => "- " + item.name + " (" + item.price + "$)").join("\n");
+alert("Contenu de votre panier :\n" + list + "\n\nPour valider, laissez un message sur le Forum !");
+}
+}
+
+function deconnexion() {
+if(confirm("Voulez-vous changer de compte ?")) {
+localStorage.removeItem('userName'); // Supprime proprement le nom
+window.location.href = '/login.html';
+}
+}
+
+function filterProducts() {
+let input = document.getElementById('searchInput').value.toLowerCase();
+let cards = document.getElementsByClassName('product-card');
+let hasResult = false;
+for (let i = 0; i < cards.length; i++) {
+let name = cards[i].querySelector('.product-name').innerText.toLowerCase();
+if (name.includes(input)) {
+cards[i].style.display = "";
+hasResult = true;
+} else {
+cards[i].style.display = "none";
+}
+}
+document.getElementById('noResult').classList.toggle('d-none', hasResult);
 }
 </script>
 
